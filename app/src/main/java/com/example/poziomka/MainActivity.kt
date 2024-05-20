@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         animatedView = AnimatedView(this)
         setContentView(animatedView!!)
     }
-
+//
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
             animatedView?.onSensorEvent(event)
