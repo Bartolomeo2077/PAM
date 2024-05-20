@@ -1,15 +1,17 @@
 package com.example.poziomka
 
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.service.voice.VoiceInteractionSession.ActivityId
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
 
@@ -17,20 +19,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var accelerometer: Sensor
     private lateinit var accelerometerManager: SensorManager
-//
-private var animatedView: AnimatedView? = null
+    private var animatedView: AnimatedView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        window?.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        requestedOrientation
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        val accelerometerManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        val accelerometer = accelerometerManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        accelerometerManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = accelerometerManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!!
         accelerometerManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME)
 
         animatedView = AnimatedView(this)
@@ -41,11 +40,10 @@ private var animatedView: AnimatedView? = null
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
             animatedView?.onSensorEvent(event)
         }
-        TODO("Not yet implemented")
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("Not yet implemented")
+        // Do something if the sensor accuracy changes
     }
 
     override fun onPause() {
@@ -69,6 +67,10 @@ private var animatedView: AnimatedView? = null
         private var height: Int = 0
         private var width: Int = 0
 
+        companion object {
+            private const val CIRCLE_RADIUS = 50
+        }
+
         override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
             super.onSizeChanged(w, h, oldw, oldh)
             height = h
@@ -76,34 +78,29 @@ private var animatedView: AnimatedView? = null
         }
 
         fun onSensorEvent(event: SensorEvent) {
-            x = x - event.values[0].toInt()
-            y = y - event.values[1].toInt()
+            x -= event.values[0].toInt()
+            y -= event.values[1].toInt()
 
-            if (x <= 0 + CIRCLE_RADIUS) {
-                x = 0 + CIRCLE_RADIUS
+            if (x <= CIRCLE_RADIUS) {
+                x = CIRCLE_RADIUS
             }
-            if (x >= 0 - CIRCLE_RADIUS) {
-                x = 0 - CIRCLE_RADIUS
+            if (x >= width - CIRCLE_RADIUS) {
+                x = width - CIRCLE_RADIUS
             }
-            if (y <= 0 + CIRCLE_RADIUS) {
-                y = 0 + CIRCLE_RADIUS
+            if (y <= CIRCLE_RADIUS) {
+                y = CIRCLE_RADIUS
             }
             if (y >= height - CIRCLE_RADIUS) {
                 y = height - CIRCLE_RADIUS
             }
+
+            invalidate()
         }
 
         override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
-            canvas.drawColor(x, y, CIRCLERADIUS, paint)
-            invalidate()
-        }
-
-        private fun invalidate() {
-            TODO("Not yet implemented")
+            canvas.drawColor(Color.WHITE)
+            canvas.drawCircle(x.toFloat(), y.toFloat(), CIRCLE_RADIUS.toFloat(), paint)
         }
     }
-
-    private fun Any.onDraw(canvas: Canvas) {
-        TODO("Not yet implemented")
-    }
+}
