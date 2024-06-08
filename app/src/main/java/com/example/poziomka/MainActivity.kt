@@ -67,6 +67,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         private var x: Int = 0
         private var y: Int = 0
 
+        private var prevX: Int = 0
+        private var prevY: Int = 0
+
         private var height: Int = 0
         private var width: Int = 0
 
@@ -82,9 +85,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             // Set initial position at the center
             x = width / 2
             y = height / 2
+
+            prevX = x
+            prevY = y
         }
 
         fun onSensorEvent(event: SensorEvent) {
+            prevX = x
+            prevY = y
+
             x -= event.values[1].toInt()
             y -= event.values[0].toInt()
 
@@ -108,6 +117,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
+
+            // Change color based on movement and boundary conditions
+            if (x != prevX || y != prevY || x == CIRCLE_RADIUS || x == width - CIRCLE_RADIUS || y == CIRCLE_RADIUS || y == height - CIRCLE_RADIUS) {
+                paint.color = Color.RED
+            } else {
+                paint.color = Color.GREEN
+            }
+
             canvas.drawCircle(x.toFloat(), y.toFloat(), CIRCLE_RADIUS.toFloat(), paint)
 
             val centerX = width / 2.0f
@@ -121,6 +138,4 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             gravity = arrayOf(x, y)
         }
     }
-
-
 }
